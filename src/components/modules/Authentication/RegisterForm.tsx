@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -50,6 +50,7 @@ export default function RegisterForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [register] = useRegisterMutation();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -62,7 +63,6 @@ export default function RegisterForm({
   });
 
   const onSubmit = async (data: z.infer<typeof registerSchema>) => {
-    console.log(data);
     const userInfo = {
       name: data.name,
       email: data.email,
@@ -71,7 +71,8 @@ export default function RegisterForm({
     try {
       const result = await register(userInfo).unwrap();
       console.log(result);
-      toast.success('User created successfully')
+      toast.success('User created successfully');
+      navigate('/verify')
     } catch (error) {
       console.log(error);
     }
