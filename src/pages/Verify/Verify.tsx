@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { Dot } from "lucide-react";
 import { useSendOtpMutation, useVerifyOtpMutation } from "@/redux/features/auth/auth.api";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const FormSchema = z.object({
     pin: z.string().min(6, {
@@ -58,18 +59,19 @@ const Verify = () => {
         },
     })
 
-    const handleConfirm = async () => {
+    const handleSendOtp = async () => {
         const toastId = toast.loading('Sending OTP')
-        setConfirm(true);
-        // try {
-        //     const res = await sendOtp({ email: email }).unwrap();
-        //     if (res.success) {
-        //         toast.success("OTP send", {id: toastId});
-        //         setConfirm(true);
-        //     }
-        // } catch (error) {
-        //     console.log(error);
-        // }
+
+        try {
+            const res = await sendOtp({ email: email }).unwrap();
+            if (res.success) {
+                toast.success("OTP send", { id: toastId });
+                setConfirm(true);
+                setTimer(120);
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     const onSubmit = async (data: z.infer<typeof FormSchema>) => {
@@ -83,6 +85,7 @@ const Verify = () => {
             if (res.success) {
                 toast.success("OTP verified", { id: toastId });
                 setConfirm(true);
+                navigate('/login');
             }
         } catch (error) {
             console.log(error);
@@ -90,11 +93,14 @@ const Verify = () => {
     }
 
     useEffect(() => {
+        if (!email || !confirm) {
+            return;
+        }
         const timerId = setInterval(() => {
-            if (email && confirm) {
-                setTimer((prev) => prev - 1)
-            }
-        }, 1000)
+            setTimer((prev) => (prev > 0 ? prev - 1 : 0));
+            console.log("Tick");
+        }, 1000);
+        return () => clearInterval(timerId)
     }, [email, confirm]);
 
     return (
@@ -141,8 +147,13 @@ const Verify = () => {
                                                     </InputOTP>
                                                 </FormControl>
                                                 <FormDescription className="flex justify-end">
-                                                    <Button variant='link'>Resend OTP</Button>
-                                                    {timer}
+                                                    <Button onClick={handleSendOtp}
+                                                        disabled={timer !== 0}
+                                                        className={cn('p-0 m-0', {
+                                                            'cursor-pointer': timer === 0
+                                                        })}
+                                                        type="button" variant='link'>Resend OTP : {timer}s
+                                                    </Button>
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -162,7 +173,7 @@ const Verify = () => {
                                 <p className="text-primary mt-1">{email}</p>
                             </CardDescription>
                             <CardFooter className="flex items-center justify-center">
-                                <Button onClick={handleConfirm} className="cursor-pointer">Confirm</Button>
+                                <Button onClick={handleSendOtp} className="cursor-pointer">Confirm</Button>
                             </CardFooter>
                         </CardHeader>
                     </Card>)

@@ -9,6 +9,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
+import config from "@/config";
 
 const loginSchema = z.object({
   email: z
@@ -43,7 +44,7 @@ export default function LoginForm({
     }
   });
 
-  const onSubmit = async(data: z.infer<typeof loginSchema>) => {
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     const userInfo = {
       email: data.email,
       password: data.password,
@@ -51,7 +52,10 @@ export default function LoginForm({
     try {
       const result = await login(userInfo).unwrap();
       console.log(result);
-      toast.success('User logged in successfully')
+      if (result.success) {
+        toast.success('User logged in successfully');
+        navigate('/');
+      }
     } catch (error) {
       console.log(error);
       if (error.data.message === 'Password does not match') {
@@ -59,7 +63,7 @@ export default function LoginForm({
       }
       if (error.data.message === 'User is not verified') {
         toast.error("Your account is not verified")
-        navigate('/verify',{state: data.email});
+        navigate('/verify', { state: data.email });
       }
     }
   }
@@ -119,6 +123,7 @@ export default function LoginForm({
         </div>
 
         <Button
+          onClick={() => window.open(`${config.baseUrl}/auth/google`)}
           type="button"
           variant="outline"
           className="w-full cursor-pointer"
