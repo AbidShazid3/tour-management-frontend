@@ -13,14 +13,28 @@ import {
 } from "@/components/ui/popover"
 import { ModeToggle } from "./ModeTggler"
 import { Link } from "react-router"
+import { authApi, useLogoutMutation, useUserInfoQuery } from "@/redux/features/auth/auth.api"
+import { toast } from "sonner"
+import { useAppDispatch } from "@/redux/hook"
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
-  { href: "/", label: "Home"},
+  { href: "/", label: "Home" },
   { href: "/about", label: "About" },
 ]
 
 export default function Navbar() {
+  const { data} = useUserInfoQuery(undefined);
+  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
+  console.log(data?.data?.email);
+
+  const handleLogout = async() => {
+    await logout(undefined);
+    dispatch(authApi.util.resetApiState());
+    toast.success('Logout successfully');
+  }
+
   return (
     <header className="border-b px-4 md:px-6">
       <div className="flex h-16 items-center justify-between gap-4">
@@ -100,10 +114,21 @@ export default function Navbar() {
         </div>
         {/* Right side */}
         <div className="flex items-center gap-2">
-          <ModeToggle/>
-          <Button asChild className="text-sm">
-            <Link to={'/login'}>Log in</Link>
-          </Button>
+          <ModeToggle />
+          {data?.data?.email && (
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="text-sm cursor-pointer"
+            >
+              Logout
+            </Button>
+          )}
+          {!data?.data?.email && (
+            <Button asChild className="text-sm cursor-pointer">
+              <Link to="/login">Login</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
