@@ -78,12 +78,14 @@ const AddTourType = () => {
                     <Button
                         variant="outline"
                         size="sm"
+                        className="cursor-pointer"
                     >
                         Previous
                     </Button>
                     <Button
                         variant="outline"
                         size="sm"
+                        className="cursor-pointer"
                     >
                         Next
                     </Button>
