@@ -16,7 +16,7 @@ import { Link } from "react-router"
 import { getSidebarItems } from "@/utils/getSidebarItems"
 import { useUserInfoQuery } from "@/redux/features/auth/auth.api"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: userData } = useUserInfoQuery(undefined);
   const data = {
     navMain: getSidebarItems(userData?.data?.role)

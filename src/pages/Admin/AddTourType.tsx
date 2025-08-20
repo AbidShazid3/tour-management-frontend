@@ -1,4 +1,4 @@
-import { useGetTourTypesQuery } from "@/redux/features/tour/tour.api";
+import { useDeleteTourTypeMutation, useGetTourTypesQuery } from "@/redux/features/tour/tour.api";
 import {
     Table,
     TableBody,
@@ -8,9 +8,11 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { AddTourTypeModal } from "@/components/modules/Admin/TourType/AddTourTypeModal";
-import { DeleteTourTypeDialog } from "@/components/modules/Admin/TourType/DeleteTourTypeDialog";
+import { DeleteConfirmation } from "@/components/DeleteConfirmation";
+import { toast } from "sonner";
+
 
 interface IItem {
     _id: string;
@@ -22,12 +24,25 @@ interface IItem {
 
 const AddTourType = () => {
     const { data } = useGetTourTypesQuery(undefined);
+    const [deleteTourType] = useDeleteTourTypeMutation();
+
+    const handleDeleteTourType = async (id: string) => {
+        const toastId = toast.loading('Deleting...')
+        try {
+            const res = await deleteTourType(id).unwrap();
+            if (res.success) {
+                toast.success("Deleted successfully", {id: toastId});
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <div className="px-5">
             <div className="flex items-center justify-between my-5">
                 <h1 className="text-xl font-semibold">Total Tour Types: {data?.meta?.total}</h1>
-                <AddTourTypeModal/>
+                <AddTourTypeModal />
             </div>
             <div className="border border-muted rounded-md">
                 <Table>
@@ -62,7 +77,11 @@ const AddTourType = () => {
                                 hour12: true,
                             })}</TableCell>
                             <TableCell className="flex gap-3 text-right">
-                                <DeleteTourTypeDialog id={item._id} />
+                                <DeleteConfirmation onConfirm={() => handleDeleteTourType(item._id)}>
+                                    <Button variant={"outline"} className="hover:text-red-600 cursor-pointer" size={"sm"}>
+                                        <Trash2 />
+                                    </Button>
+                                </DeleteConfirmation>
                                 <Button className="cursor-pointer" size={"sm"}><Pencil /></Button>
                             </TableCell>
                         </TableRow>)
