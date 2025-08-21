@@ -73,7 +73,7 @@ export function AddTourTypeModal() {
                                 <FormItem>
                                     <FormLabel>Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Tour Type Name" {...field} />
+                                        <Input required placeholder="Tour Type Name" {...field} />
                                     </FormControl>
                                     <FormDescription>
                                     </FormDescription>

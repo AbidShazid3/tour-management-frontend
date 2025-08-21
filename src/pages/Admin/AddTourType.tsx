@@ -89,7 +89,7 @@ const AddTourType = () => {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 pt-10">
+            <div className="flex items-center justify-end space-x-2 pt-6">
                 <div className="text-muted-foreground flex-1 text-sm">
                     Page {data?.meta.page} of {data?.meta.totalPage}
                 </div>
