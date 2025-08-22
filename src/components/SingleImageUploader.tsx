@@ -38,7 +38,7 @@ export default function SingleImageUploader({onChange}: SingleImageUploaderProps
   const previewUrl = files[0]?.preview || null
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 cursor-pointer">
       <div className="relative">
         {/* Drop area */}
         <div
@@ -104,20 +104,6 @@ export default function SingleImageUploader({onChange}: SingleImageUploaderProps
           <span>{errors[0]}</span>
         </div>
       )}
-
-      <p
-        aria-live="polite"
-        role="region"
-        className="text-muted-foreground mt-2 text-center text-xs"
-      >
-        Single image uploader w/ max size ∙{" "}
-        <a
-          href="https://github.com/origin-space/originui/tree/main/docs/use-file-upload.md"
-          className="hover:text-foreground underline"
-        >
-          API
-        </a>
-      </p>
     </div>
   )
 }

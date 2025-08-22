@@ -29,7 +29,6 @@ import { Textarea } from "@/components/ui/textarea"
 import SingleImageUploader from "@/components/SingleImageUploader"
 import { useAddDivisionMutation } from "@/redux/features/division/division.api"
 import { toast } from "sonner"
-import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
     name: z.string(),
@@ -118,9 +117,7 @@ export function AddDivisionModal() {
                         <Button disabled={isLoading} variant="outline">Cancel</Button>
                     </DialogClose>
                     <Button disabled={isLoading || !image} form="add-division" type="submit" className="cursor-pointer">
-                        {isLoading ? (<>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Submitting...</>) : ("Submit")}
+                        {isLoading ? ("Submitting...") : ("Submit")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

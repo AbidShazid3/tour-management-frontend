@@ -3,6 +3,43 @@ import { baseApi } from "@/redux/baseApi";
 
 export const tourApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
+        getTour: builder.query({
+            query: () => ({
+                url: '/tour',
+                method: "GET",
+            }),
+            providesTags: ['TOUR'],
+        }),
+        getSingleTour: builder.query({
+            query: (id) => ({
+                url: `/tour/${id}`,
+                method: "GET",
+            }),
+            providesTags: ['TOUR'],
+        }),
+        addTour: builder.mutation({
+            query: (tourInfo) => ({
+                url: '/tour/create',
+                method: 'POST',
+                data: tourInfo
+            }),
+            invalidatesTags: ['TOUR'],
+        }),
+        updateTour: builder.mutation({
+            query: (id, ...tourInfo) => ({
+                url: `/tour/${id}`,
+                method: 'PATCH',
+                data: tourInfo
+            }),
+            invalidatesTags: ['TOUR'],
+        }),
+        deleteTour: builder.mutation({
+            query: (id) => ({
+                url: `/tour/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['TOUR'],
+        }),
         getTourTypes: builder.query({
             query: () => ({
                 url: '/tour/tour-types',
@@ -38,7 +75,12 @@ export const tourApi = baseApi.injectEndpoints({
 })
 
 
-export const { useGetTourTypesQuery,
+export const { useGetTourQuery,
+    useGetSingleTourQuery,
+    useAddTourMutation,
+    useUpdateTourMutation,
+    useDeleteTourMutation,
+    useGetTourTypesQuery,
     useAddTourTypeMutation,
     useUpdateTourTypeMutation,
     useDeleteTourTypeMutation,
