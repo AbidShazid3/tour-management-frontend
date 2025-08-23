@@ -506,7 +506,7 @@ export function AddTourModal() {
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div className="mt-1">
+                            <div>
                                 <div className="flex items-center gap-2">
                                     <p className="font-semibold">Amenities</p>
                                     <Button
@@ -544,7 +544,7 @@ export function AddTourModal() {
                                     ))}
                                 </div>
                             </div>
-                            <div className="mt-1">
+                            <div>
                                 <div className="flex items-center gap-2">
                                     <p className="font-semibold">Tour Plan</p>
                                     <Button
