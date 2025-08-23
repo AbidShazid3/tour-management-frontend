@@ -6,17 +6,22 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import { ModeToggle } from "./ModeTggler"
 import { Link } from "react-router"
 import { authApi, useLogoutMutation, useUserInfoQuery } from "@/redux/features/auth/auth.api"
 import { toast } from "sonner"
 import { useAppDispatch } from "@/redux/hook"
 import { role } from "@/constants/role"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet"
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -31,7 +36,6 @@ export default function Navbar() {
   const { data } = useUserInfoQuery(undefined);
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
-  console.log(data?.data?.email);
 
   const handleLogout = async () => {
     await logout(undefined);
@@ -45,64 +49,67 @@ export default function Navbar() {
         {/* Left side */}
         <div className="flex items-center gap-2">
           {/* Mobile menu trigger */}
-          <Popover>
-            <PopoverTrigger asChild>
+          <Sheet>
+            <SheetTrigger asChild>
               <Button
-                className="group size-8 md:hidden"
+                className="md:hidden"
                 variant="ghost"
                 size="icon"
               >
                 <svg
-                  className="pointer-events-none"
-                  width={16}
-                  height={16}
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    d="M4 12L20 12"
-                    className="origin-center -translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[315deg]"
-                  />
-                  <path
-                    d="M4 12H20"
-                    className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] group-aria-expanded:rotate-45"
-                  />
-                  <path
-                    d="M4 12H20"
-                    className="origin-center translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[135deg]"
-                  />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
                 </svg>
               </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-36 p-1 md:hidden">
-              <NavigationMenu className="max-w-none *:w-full">
-                <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full h-full">
+              <SheetHeader>
+                <SheetTitle>
+                  <Logo />
+                </SheetTitle>
+                <SheetDescription>
+                </SheetDescription>
+              </SheetHeader>
+              <div className="flex flex-col h-full">
+                <nav className="flex flex-col items-center justify-center gap-4 text-lg font-medium">
                   {navigationLinks.map((link, index) => {
                     if (link.role === "PUBLIC" || link.role === data?.data?.role) {
                       return (
-                        <NavigationMenuItem key={index} className="w-full">
-                          <NavigationMenuLink asChild className="py-1.5">
-                            <Link to={link.href}>{link.label}</Link>
-                          </NavigationMenuLink>
-                        </NavigationMenuItem>
-                      );
+                        <SheetClose asChild key={index}>
+                          <Link
+                            to={link.href}
+                            className="hover:text-primary">
+                            {link.label}
+                          </Link>
+                        </SheetClose>
+                      )
                     }
-                    return null;
+                    return null
                   })}
-                </NavigationMenuList>
-              </NavigationMenu>
-            </PopoverContent>
-          </Popover>
+                </nav>
+              </div>
+              <SheetFooter>
+                <SheetClose asChild>
+                  <Button className="cursor-pointer" size={"sm"}>Close</Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
           {/* Main nav */}
           <div className="flex items-center gap-6">
-            <a href="#" className="text-primary hover:text-primary/90">
+            <Link to={'/'} className="text-primary hover:text-primary/90">
               <Logo />
-            </a>
+            </Link>
             {/* Navigation menu */}
             <NavigationMenu className="max-md:hidden">
               <NavigationMenuList className="gap-2">
