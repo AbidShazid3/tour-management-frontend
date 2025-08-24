@@ -5,7 +5,7 @@ import { Link } from "react-router";
 
 const Tours = () => {
     const { data } = useGetTourQuery(undefined);
-    console.log(data);
+
 
   return (
     <div className="mt-5 grid grid-cols-12 gap-5 p-4 lg:p-5">

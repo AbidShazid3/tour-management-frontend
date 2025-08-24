@@ -1,13 +1,25 @@
 import { Button } from "@/components/ui/button";
+import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
 import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
 import { format } from "date-fns";
-import { Link, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 
 const TourDetails = () => {
     const { slug } = useParams();
     const { data: tourData, isLoading } = useGetSingleTourQuery(slug);
-    console.log(tourData);
+    const { data: userInfo } = useUserInfoQuery(undefined);
+    const navigate = useNavigate();
+
+    const handleBookingPage = () => {
+        if (!userInfo?.data?.phone || !userInfo?.data?.address) {
+            toast.error("Please update your profile first to booking a tour");
+            return;
+        }
+        navigate(`/booking/${tourData?.data?.slug}`);
+    }
+
     if (isLoading) {
         return <p>Loading ...</p>
     }
@@ -18,8 +30,8 @@ const TourDetails = () => {
             <div >
                 <div className="flex justify-between items-center  mb-2">
                     <h1 className="text-2xl md:text-3xl font-bold mb-2">{tourData?.data?.title}</h1>
-                    <Button asChild>
-                        <Link to={`/booking/${tourData?.data?._id}`}>Book Now</Link>
+                    <Button onClick={handleBookingPage} className="cursor-pointer">
+                        Book Now
                     </Button>
                 </div>
                 <div className="flex flex-col gap-2 text-gray-600 mb-5 
