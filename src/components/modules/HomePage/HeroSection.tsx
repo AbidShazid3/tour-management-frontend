@@ -123,7 +123,7 @@ const HeroSection = ({
                 disabled={divisionIsLoading}
               >
                 <SelectTrigger className="w-full sm:w-60">
-                  <SelectValue placeholder="Search a division" />
+                  <SelectValue placeholder="Search Tours By Division" />
                 </SelectTrigger>
                 <SelectContent>
                   {divisionOptions?.map((item: { value: string; label: string }) => (
