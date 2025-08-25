@@ -13,33 +13,9 @@ import { toast } from "sonner";
 import { useDeleteTourMutation, useGetTourQuery } from "@/redux/features/tour/tour.api";
 import { AddTourModal } from "@/components/modules/Admin/Tour/AddTourModal";
 
-
-interface IItem {
-    _id: string;
-    title: string;
-    slug: string;
-    description?: string;
-    images: string[];
-    location: string;
-    costFrom: number;
-    startDate: string;
-    departureLocation: string;
-    arrivalLocation: string;
-    endDate: string;
-    included: string[];
-    excluded: string[]
-    amenities: string[];
-    tourPlan: string[];
-    maxGuest: number;
-    minAge: number;
-    division: string;
-    tourType: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
 const AddTour = () => {
     const { data: tourData } = useGetTourQuery(undefined);
+    console.log(tourData);
     const [deleteTour] = useDeleteTourMutation();
 
     const handleDeleteTour = async (id: string) => {
@@ -75,7 +51,7 @@ const AddTour = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {tourData?.data?.map((item: IItem, idx: number) =>
+                        {tourData?.data?.map((item, idx: number) =>
                         (<TableRow key={item._id}>
                             <TableCell className="font-medium pl-3">{idx + 1}.</TableCell>
                             <TableCell>{item?.title}</TableCell>
@@ -114,13 +90,14 @@ const AddTour = () => {
             </div>
             <div className="flex items-center justify-end space-x-2 pt-6">
                 <div className="text-muted-foreground flex-1 text-sm">
-                    Page {tourData?.meta.page} of {tourData?.meta.totalPage}
+                    Page {tourData?.meta?.page ?? 1} of {tourData?.meta?.totalPage ?? 1}
                 </div>
                 <div className="space-x-2">
                     <Button
                         variant="outline"
                         size="sm"
                         className="cursor-pointer"
+                        disabled={(tourData?.meta?.page ?? 1) <= 1}
                     >
                         Previous
                     </Button>
@@ -128,6 +105,7 @@ const AddTour = () => {
                         variant="outline"
                         size="sm"
                         className="cursor-pointer"
+                        disabled={(tourData?.meta?.page ?? 1) >= (tourData?.meta?.totalPage ?? 1)}
                     >
                         Next
                     </Button>

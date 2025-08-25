@@ -1,10 +1,13 @@
 
 
-import { ArrowDownRight, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
+import { useGetDivisionQuery } from "@/redux/features/division/division.api";
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Hero3Props {
   heading?: string;
@@ -34,12 +37,8 @@ const HeroSection = ({
   description = "Explore breathtaking destinations, unique experiences, and unforgettable memories. Find the perfect tour that matches your dream getaway.",
   buttons = {
     primary: {
-      text: "Explore",
+      text: "Explore Tours",
       url: "/tours",
-    },
-    secondary: {
-      text: "Get Started",
-      url: "/login",
     },
   },
   reviews = {
@@ -69,11 +68,15 @@ const HeroSection = ({
     ],
   },
 }: Hero3Props) => {
+  const { data: divisionData, isLoading: divisionIsLoading } = useGetDivisionQuery(undefined);
+  const [selectedDivision, setSelectedDivision] = useState<string | undefined>(undefined);
+  const divisionOptions = divisionData?.data?.map((item: { _id: string, name: string }) => ({ value: item._id, label: item.name }))
+
   return (
     <section>
       <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-20">
-        <div className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl lg:items-start lg:text-left">
-          <h1 className="my-6 text-pretty text-4xl font-bold lg:text-6xl xl:text-7xl">
+        <div className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl lg:items-start lg:text-left p-4">
+          <h1 className="my-6 text-pretty text-3xl md:text-5xl font-bold 2xl:text-7xl">
             {heading}
           </h1>
           <p className="text-muted-foreground mb-8 max-w-xl lg:text-xl">
@@ -104,21 +107,45 @@ const HeroSection = ({
               </p>
             </div>
           </div>
-          <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:justify-start">
+            {/* Primary Button */}
             {buttons.primary && (
-              <Button asChild className="w-full sm:w-auto">
+              <Button asChild variant="outline" className="w-full sm:w-auto">
                 <Link to={buttons.primary.url}>{buttons.primary.text}</Link>
               </Button>
             )}
-            {buttons.secondary && (
-              <Button asChild variant="outline">
-                <Link to={buttons.secondary.url}>
-                  {buttons.secondary.text}
-                  <ArrowDownRight className="size-4" />
-                </Link>
-              </Button>
-            )}
+
+            {/* Division Select + Search Button */}
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+              <Select
+                onValueChange={setSelectedDivision}
+                value={selectedDivision ? selectedDivision : ""}
+                disabled={divisionIsLoading}
+              >
+                <SelectTrigger className="w-full sm:w-60">
+                  <SelectValue placeholder="Search a division" />
+                </SelectTrigger>
+                <SelectContent>
+                  {divisionOptions?.map((item: { value: string; label: string }) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {selectedDivision ? (
+                <Button asChild className="w-full sm:w-auto">
+                  <Link to={`/tours?division=${selectedDivision}`}>Search</Link>
+                </Button>
+              ) : (
+                <Button disabled className="w-full sm:w-auto">
+                  Search
+                </Button>
+              )}
+            </div>
           </div>
+
         </div>
         <div className="flex">
           <img

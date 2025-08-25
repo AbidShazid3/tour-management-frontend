@@ -2,10 +2,18 @@ import type { ComponentType } from 'react';
 export type { ISendOtp, ILogin, IVerifyOtp } from './auth.type';
 export type { ITourPackage } from './tour.type';
 
+export interface IMeta {
+  page?: number;
+  limit?: number;
+  totalPage?: number;
+  total?: number
+}
+
 export interface IResponse<T> {
   statusCode: number
   success: boolean
   message: string
+  meta?: IMeta
   data: T
 }
 

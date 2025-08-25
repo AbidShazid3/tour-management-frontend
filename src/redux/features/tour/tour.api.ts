@@ -5,9 +5,10 @@ import type { IResponse, ITourPackage } from "@/types";
 export const tourApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         getTour: builder.query<IResponse<ITourPackage[]>, unknown>({
-            query: () => ({
+            query: (params) => ({
                 url: '/tour',
                 method: "GET",
+                params: params,
             }),
             providesTags: ['TOUR'],
         }),
