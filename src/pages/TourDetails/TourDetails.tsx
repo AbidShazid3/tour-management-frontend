@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
-import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
+import { useGetDivisionQuery } from "@/redux/features/division/division.api";
+import { useGetSingleTourQuery, useGetSingleTourTypesQuery } from "@/redux/features/tour/tour.api";
 import { format } from "date-fns";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
@@ -10,6 +11,8 @@ const TourDetails = () => {
     const { slug } = useParams();
     const { data: tourData, isLoading } = useGetSingleTourQuery(slug);
     const { data: userInfo } = useUserInfoQuery(undefined);
+    const { data: divisionData } = useGetDivisionQuery({_id: tourData?.data?.division, fields: "name"}, { skip: !tourData })
+    const { data: tourTypeData } = useGetSingleTourTypesQuery(tourData?.data?.tourType, { skip: !tourData })
     const navigate = useNavigate();
 
     const handleBookingPage = () => {
@@ -62,17 +65,8 @@ const TourDetails = () => {
                     <div className="space-y-2">
                         <p>
                             <strong>Dates:</strong>{" "}
-                            {format(
-                                new Date(
-                                    tourData?.data?.startDate ? tourData?.data?.startDate : new Date()
-                                ),
-                                "PP"
-                            )}{" "}
-                            -{" "}
-                            {format(
-                                new Date(tourData?.data?.endDate ? tourData?.data?.endDate : new Date()),
-                                "PP"
-                            )}
+                            {format(new Date(tourData?.data?.startDate ? tourData?.data?.startDate : new Date()),"PP")}{" "}-{" "}
+                            {format(new Date(tourData?.data?.endDate ? tourData?.data?.endDate : new Date()),"PP")}
                         </p>
                         <p>
                             <strong>Departure:</strong> {tourData?.data?.departureLocation}
@@ -81,11 +75,10 @@ const TourDetails = () => {
                             <strong>Arrival:</strong> {tourData?.data?.arrivalLocation}
                         </p>
                         <p>
-                            <strong>Division:</strong>
-                            {/* {divisionData?.[0]?.name} */}
+                            <strong>Division:</strong> {divisionData?.data[0]?.name}
                         </p>
                         <p>
-                            <strong>Tour Type:</strong> {tourData?.data?.tourType}
+                            <strong>Tour Type:</strong> {tourTypeData?.data?.name}
                         </p>
                         <p>
                             <strong>Min Age:</strong> {tourData?.data?.minAge} years
