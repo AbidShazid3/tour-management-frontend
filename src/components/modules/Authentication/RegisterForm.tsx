@@ -10,6 +10,7 @@ import Password from "@/components/ui/Password";
 import { useRegisterMutation } from "@/redux/features/auth/auth.api";
 import { toast } from "sonner";
 import config from "@/config";
+import { handleApiError } from "@/utils/apiErrorHandler";
 
 const registerSchema = z.object({
   name: z.string()
@@ -64,6 +65,7 @@ export default function RegisterForm({
   });
 
   const onSubmit = async (data: z.infer<typeof registerSchema>) => {
+    const toastId = toast.loading("Registering...");
     const userInfo = {
       name: data.name,
       email: data.email,
@@ -71,11 +73,12 @@ export default function RegisterForm({
     }
     try {
       const result = await register(userInfo).unwrap();
-      console.log(result);
-      toast.success('User created successfully');
-      navigate('/verify',{state: data.email});
+      if (result.success) {
+        toast.success('User created successfully', {id: toastId});
+        navigate('/verify', { state: data.email });
+      }
     } catch (error) {
-      console.log(error);
+      handleApiError(error, toastId as string)
     }
   }
 
@@ -166,7 +169,7 @@ export default function RegisterForm({
         </div>
 
         <Button
-          onClick={()=> window.open(`${config.baseUrl}/auth/google`)}
+          onClick={() => window.open(`${config.baseUrl}/auth/google`)}
           type="button"
           variant="outline"
           className="w-full cursor-pointer"
@@ -177,7 +180,7 @@ export default function RegisterForm({
 
       <div className="text-center text-sm">
         Already have an account?{" "}
-        <Link to="/login" className="underline underline-offset-4">
+        <Link to="/login" className="underline underline-offset-4 hover:text-orange-500">
           Login
         </Link>
       </div>

@@ -136,7 +136,7 @@ export default function LoginForm({
       </div>
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
-        <Link to={'/register'} className="underline underline-offset-2 hover:text-orange-500">Register</Link>
+        <Link to={'/register'} className="underline underline-offset-4 hover:text-orange-500">Register</Link>
       </div>
     </div>
   )

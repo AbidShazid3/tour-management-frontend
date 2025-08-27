@@ -27,7 +27,6 @@ interface IItem {
 const AddDivision = () => {
     const { data } = useGetDivisionQuery(undefined);
     const [deleteDivision] = useDeleteDivisionMutation();
-    console.log(data);
 
     const handleDeleteDivision = async (id: string) => {
         const toastId = toast.loading('Deleting...')
