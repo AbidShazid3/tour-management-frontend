@@ -7,11 +7,22 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { AddTourTypeModal } from "@/components/modules/Admin/TourType/AddTourTypeModal";
 import { DeleteConfirmation } from "@/components/DeleteConfirmation";
 import { toast } from "sonner";
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { handleApiError } from "@/utils/apiErrorHandler";
 
 
 interface IItem {
@@ -23,26 +34,69 @@ interface IItem {
 
 
 const AddTourType = () => {
-    const { data } = useGetTourTypesQuery(undefined);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [sort, setSort] = useState("-createdAt");
+    const { data } = useGetTourTypesQuery({ page: currentPage, limit, sort });
     const [deleteTourType] = useDeleteTourTypeMutation();
+    const totalPage = data?.meta?.totalPage || 1;
 
     const handleDeleteTourType = async (id: string) => {
         const toastId = toast.loading('Deleting...')
         try {
             const res = await deleteTourType(id).unwrap();
             if (res.success) {
-                toast.success("Deleted successfully", {id: toastId});
+                toast.success("Deleted successfully", { id: toastId });
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: unknown) {
+            handleApiError(error, toastId as string)
         }
     }
 
     return (
-        <div className="px-5">
-            <div className="flex items-center justify-between my-5">
-                <h1 className="text-xl font-semibold">Total Tour Types: {data?.meta?.total}</h1>
+        <div>
+            <div className="flex items-center justify-between">
+                <h1 className="text-xl font-semibold">Total Types: {data?.meta?.total}</h1>
                 <AddTourTypeModal />
+            </div>
+            <div className="flex items-center gap-2 md:gap-5 my-3">
+                <div className="flex items-center">
+                    <Select
+                        value={sort}
+                        onValueChange={(value) => {
+                            setSort(value);
+                            setCurrentPage(1);
+                        }}
+                    >
+                        <SelectTrigger className="w-30">
+                            <SelectValue placeholder="Select sort" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-createdAt">Newest</SelectItem>
+                            <SelectItem value="createdAt">Oldest</SelectItem>
+                            <SelectItem value="name">Name(A-Z)</SelectItem>
+                            <SelectItem value="-name">Name(Z-A)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="flex items-center">
+                    <Select
+                        value={limit.toString()}
+                        onValueChange={(val) => {
+                            setLimit(Number(val));
+                            setCurrentPage(1);
+                        }}
+                    >
+                        <SelectTrigger className="w-40">
+                            <SelectValue placeholder="Select limit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="5">Showing Limit 5</SelectItem>
+                            <SelectItem value="10">Showing Limit 10</SelectItem>
+                            <SelectItem value="20">Showing Limit 20</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
             <div className="border border-muted rounded-md">
                 <Table>
@@ -89,27 +143,28 @@ const AddTourType = () => {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 pt-6">
-                <div className="text-muted-foreground flex-1 text-sm">
-                    Page {data?.meta.page} of {data?.meta.totalPage}
+            {totalPage > 1 &&
+                <div className="pt-6">
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious onClick={() => setCurrentPage(prev => prev - 1)} className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'} />
+                            </PaginationItem>
+                            {Array.from({ length: totalPage }, (_, index) => index + 1).map((page) =>
+                                <PaginationItem
+                                    key={page}>
+                                    <PaginationLink
+                                        onClick={() => setCurrentPage(page)}
+                                        isActive={currentPage === page}
+                                        className="cursor-pointer">{page}</PaginationLink>
+                                </PaginationItem>)}
+                            <PaginationItem>
+                                <PaginationNext onClick={() => setCurrentPage(prev => prev + 1)} className={currentPage === totalPage ? "pointer-events-none opacity-50" : "cursor-pointer"} />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
                 </div>
-                <div className="space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="cursor-pointer"
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="cursor-pointer"
-                    >
-                        Next
-                    </Button>
-                </div>
-            </div>
+            }
         </div>
     );
 };

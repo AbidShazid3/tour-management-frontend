@@ -4,15 +4,16 @@ import { baseApi } from "@/redux/baseApi";
 export const divisionApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         getDivision: builder.query({
-            query: () => ({
+            query: (params) => ({
                 url: '/division',
                 method: 'GET',
+                params,
             }),
             providesTags: ['DIVISION'],
         }),
         getSingleDivision: builder.query({
-            query: (id) => ({
-                url: `/division/${id}`,
+            query: (slug) => ({
+                url: `/division/${slug}`,
                 method: 'GET',
             }),
             providesTags: ['DIVISION'],
