@@ -23,6 +23,7 @@ import { AddTourModal } from "@/components/modules/Admin/Tour/AddTourModal";
 import { Link, useSearchParams } from "react-router";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { handleApiError } from "@/utils/apiErrorHandler";
 
 const AddTour = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -42,8 +43,8 @@ const AddTour = () => {
             if (res.success) {
                 toast.success("Deleted successfully", { id: toastId });
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: unknown) {
+            handleApiError(error, toastId as string)
         }
     }
 

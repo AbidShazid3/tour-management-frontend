@@ -12,6 +12,7 @@ import { useDeleteDivisionMutation, useGetDivisionQuery } from "@/redux/features
 import { DeleteConfirmation } from "@/components/DeleteConfirmation";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { handleApiError } from "@/utils/apiErrorHandler";
 
 interface IItem {
     _id: string;
@@ -35,8 +36,8 @@ const AddDivision = () => {
             if (res.success) {
                 toast.success("Deleted successfully", { id: toastId });
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: unknown) {
+            handleApiError(error, toastId as string)
         }
     }
 

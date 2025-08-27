@@ -41,6 +41,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon, Plus, Trash2 } from "lucide-react"
 import MultipleImageUploader from "@/components/MultipleImageUploader"
 import type { FileMetadata } from "@/hooks/use-file-upload"
+import { handleApiError } from "@/utils/apiErrorHandler"
 
 const formSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -69,10 +70,10 @@ export function AddTourModal() {
     const [images, setImages] = useState<(File | FileMetadata)[] | []>([]);
     const [addTour, { isLoading }] = useAddTourMutation();
 
-    const { data: divisionData, isLoading: divisionLoading } = useGetDivisionQuery(undefined);
+    const { data: divisionData, isLoading: divisionLoading } = useGetDivisionQuery({limit: 1000,fields: '_id,name'});
     const divisionOptions = divisionData?.data?.map((item: { _id: string, name: string }) => ({ value: item._id, label: item.name }))
 
-    const { data: tourTypeData, isLoading: tourTypeLoading } = useGetTourTypesQuery(undefined);
+    const { data: tourTypeData, isLoading: tourTypeLoading } = useGetTourTypesQuery({limit: 1000,fields: '_id,name'});
     const tourTypeOptions = tourTypeData?.data?.map((item: { _id: string, name: string }) => ({ value: item._id, label: item.name }))
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -141,17 +142,18 @@ export function AddTourModal() {
         const formData = new FormData();
         formData.append('data', JSON.stringify(tourInfo));
         images.forEach((image) => formData.append('files', image as File));
+        const toastId = toast.loading('Creating...')
 
         try {
             const res = await addTour(formData).unwrap();
             if (res.success) {
-                toast.success("Tour create successfully")
+                toast.success("Tour create successfully",{id: toastId})
                 setOpen(false);
                 form.reset();
                 setImages([]);
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: unknown) {
+            handleApiError(error, toastId as string)
         }
     }
 

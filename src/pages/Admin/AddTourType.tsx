@@ -22,6 +22,7 @@ import { DeleteConfirmation } from "@/components/DeleteConfirmation";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { handleApiError } from "@/utils/apiErrorHandler";
 
 
 interface IItem {
@@ -47,8 +48,8 @@ const AddTourType = () => {
             if (res.success) {
                 toast.success("Deleted successfully", { id: toastId });
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: unknown) {
+            handleApiError(error, toastId as string)
         }
     }
 

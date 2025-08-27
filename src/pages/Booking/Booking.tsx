@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useCreateBookingMutation } from "@/redux/features/booking/booking.api";
 import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
+import { handleApiError } from "@/utils/apiErrorHandler";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { toast } from "sonner";
@@ -28,6 +29,7 @@ const Booking = () => {
     }, [isLoading, isError, tourData, guestCount])
 
     const handleBooking = async (id: string) => {
+        const toastId = toast.loading("Creating booking...");
         const bookingInfo = {
             tour: id,
             guestCount: guestCount,
@@ -35,11 +37,11 @@ const Booking = () => {
         try {
             const res = await createBooking(bookingInfo).unwrap();
             if (res.success) {
-                toast.success("Booking created successfully")
+                toast.success("Booking created successfully",{id:toastId})
                 window.open(res.data.paymentUrl)
             }
         } catch (error) {
-            console.log(error);
+            handleApiError(error, toastId as string)
         }
     }
 

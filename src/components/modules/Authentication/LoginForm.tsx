@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Link, useNavigate } from "react-router"
@@ -10,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import config from "@/config";
+import { handleApiError } from "@/utils/apiErrorHandler";
 
 const loginSchema = z.object({
   email: z
@@ -45,6 +47,7 @@ export default function LoginForm({
   });
 
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
+    const toastId = toast.loading("Logging in...");
     const userInfo = {
       email: data.email,
       password: data.password,
@@ -53,11 +56,10 @@ export default function LoginForm({
       const result = await login(userInfo).unwrap();
       console.log(result);
       if (result.success) {
-        toast.success('User logged in successfully');
+        toast.success('User logged in successfully', { id: toastId });
         navigate('/');
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
       if (error.data.message === 'Password does not match') {
         toast.error("Invalid credentials")
       }
@@ -65,6 +67,7 @@ export default function LoginForm({
         toast.error("Your account is not verified")
         navigate('/verify', { state: data.email });
       }
+      handleApiError(error, toastId as string)
     }
   }
 

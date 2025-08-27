@@ -25,9 +25,13 @@ import {
 import { useAddTourTypeMutation } from "@/redux/features/tour/tour.api"
 import { toast } from "sonner"
 import { useState } from "react"
+import { handleApiError } from "@/utils/apiErrorHandler"
 
 const formSchema = z.object({
-    name: z.string(),
+    name: z.string()
+        .min(2, "Name must be at least 2 characters")
+        .max(50, "Name must be at most 50 characters")
+        .regex(/^[A-Za-z\s]+$/, "Name can only contain letters and spaces"),
 })
 
 export function AddTourTypeModal() {
@@ -41,15 +45,16 @@ export function AddTourTypeModal() {
     })
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
+        const toastId = toast.loading('creating...')
         try {
             const res = await addTourType(data).unwrap();
             if (res.success) {
-                toast.success("Tour Type create successfully")
+                toast.success("Tour Type create successfully", { id: toastId });
                 setOpen(false);
                 form.reset();
             }
         } catch (error) {
-            console.log(error);
+            handleApiError(error, toastId as string);
         }
     }
 

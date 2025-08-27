@@ -29,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea"
 import SingleImageUploader from "@/components/SingleImageUploader"
 import { useAddDivisionMutation } from "@/redux/features/division/division.api"
 import { toast } from "sonner"
+import { handleApiError } from "@/utils/apiErrorHandler"
 
 const formSchema = z.object({
     name: z.string(),
@@ -52,17 +53,18 @@ export function AddDivisionModal() {
         const formData = new FormData();
         formData.append('data', JSON.stringify(data));
         formData.append('file', image as File);
+        const toastId = toast.loading('Creating...')
 
         try {
             const res = await addDivision(formData).unwrap();
             if (res.success) {
-                toast.success("Tour Division create successfully")
+                toast.success("Tour Division create successfully", { id: toastId })
                 setOpen(false);
                 form.reset();
                 setImage(null);
             }
         } catch (error) {
-            console.log(error);
+            handleApiError(error, toastId as string)
         }
     }
 
